@@ -15,7 +15,7 @@ const sendBirthdayEmail = async (student) => {
         const sendSmtpEmail = {
             sender: {
                 name: "Student Portal",
-                email: process.env.EMAIL_USER   // Brevo pe verified sender email
+                email: process.env.EMAIL_USER
             },
             to: [{ email: student.email, name: student.name }],
             subject: `🎂 Happy Birthday ${student.name}!`,
@@ -55,6 +55,13 @@ const sendBirthdayEmail = async (student) => {
             `❌ Birthday email failed for ${student.email}:`,
             error.message
         );
+
+        // 🆕 Poora error detail print karo
+        if (error.response && error.response.body) {
+            console.error("🔍 Full Brevo Error:", JSON.stringify(error.response.body));
+        } else {
+            console.error("🔍 Full Error Object:", JSON.stringify(error));
+        }
 
         return false;
     }
