@@ -10,54 +10,39 @@ const transporter = nodemailer.createTransport({
 
 const sendBirthdayEmail = async (student) => {
 
-    try {
+    const mailOptions = {
+        from: `"Student Portal" <${process.env.EMAIL_USER}>`,
+        to: student.email,
+        subject: `🎂 Happy Birthday ${student.name}!`,
+        html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>🎉 Happy Birthday, ${student.name}! 🎂</h2>
 
-        console.log("📧 Email sending started...");
-        console.log("📧 To:", student.email);
-        console.log("📧 Email user:", process.env.EMAIL_USER ? "Available" : "Missing");
-        console.log("📧 Email password:", process.env.EMAIL_PASS ? "Available" : "Missing");
+                <p>
+                    Student Portal ki taraf se aapko
+                    <strong>Happy Birthday</strong>!
+                </p>
 
-        const mailOptions = {
-            from: `"Student Portal" <${process.env.EMAIL_USER}>`,
-            to: student.email,
-            subject: `🎂 Happy Birthday ${student.name}!`,
-            html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2>🎉 Happy Birthday, ${student.name}! 🎂</h2>
+                <p>
+                    Aapka aaj ka din khushiyon aur safalta se bhara rahe.
+                </p>
 
-                    <p>
-                        Student Portal ki taraf se aapko
-                        <strong>Happy Birthday</strong>!
-                    </p>
+                <br>
 
-                    <p>
-                        Aapka aaj ka din khushiyon aur safalta se bhara rahe.
-                    </p>
+                <p>Best Wishes ❤️</p>
+                <p><strong>Student Portal Team</strong></p>
+            </div>
+        `
+    };
 
-                    <br>
+    const info = await transporter.sendMail(mailOptions);
 
-                    <p>Best Wishes ❤️</p>
-                    <p><strong>Student Portal Team</strong></p>
-                </div>
-            `
-        };
+    console.log(
+        `Birthday email sent to ${student.email}`,
+        info.messageId
+    );
 
-        const info = await transporter.sendMail(mailOptions);
-
-        console.log(
-            `✅ Birthday email sent to ${student.email}`,
-            info.messageId
-        );
-
-        return true;
-
-    } catch (error) {
-
-        console.error("❌ EMAIL ERROR:", error.message);
-
-        return false;
-
-    }
+    return info;
 };
 
 module.exports = {
