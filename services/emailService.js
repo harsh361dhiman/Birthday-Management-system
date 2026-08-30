@@ -1,19 +1,23 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 const sendBirthdayEmail = async (student) => {
-
     try {
 
         console.log("📧 Email sending started...");
         console.log("📧 To:", student.email);
 
-        const { data, error } = await resend.emails.send({
-            from: "Birthday Management <onboarding@resend.dev>",
-            to: [student.email],
+        const mailOptions = {
+            from: `"Student Portal" <${process.env.EMAIL_USER}>`,
+            to: student.email,
             subject: `🎂 Happy Birthday ${student.name}!`,
-
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px;">
                     <h2>🎉 Happy Birthday, ${student.name}! 🎂</h2>
@@ -33,25 +37,24 @@ const sendBirthdayEmail = async (student) => {
                     <p><strong>Student Portal Team</strong></p>
                 </div>
             `
-        });
+        };
 
-        if (error) {
-            console.error("❌ Resend Error:", error);
-            return false;
-        }
+        const info = await transporter.sendMail(mailOptions);
 
         console.log(
-            `✅ Birthday email sent to ${student.email}`,
-            data
+            `✅ Birthday email sent to ${student.email}: ${info.messageId}`
         );
 
         return true;
 
     } catch (error) {
 
-        console.error("❌ EMAIL ERROR:", error.message);
-        return false;
+        console.error(
+            `❌ Birthday email failed for ${student.email}:`,
+            error.message
+        );
 
+        return false;
     }
 };
 
