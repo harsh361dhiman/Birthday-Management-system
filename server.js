@@ -1,3 +1,5 @@
+const dns = require("dns");
+dns.setDefaultResultOrder("ipv4first");
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -149,7 +151,7 @@ app.listen(PORT, () => {
 
 // ================= AUTOMATIC BIRTHDAY EMAIL =================
 
-cron.schedule("35 15 * * *", async () => {
+cron.schedule("48 15 * * *", async () => {
 
     try {
 
