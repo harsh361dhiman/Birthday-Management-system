@@ -1,48 +1,58 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendBirthdayEmail = async (student) => {
 
-    const mailOptions = {
-        from: `"Student Portal" <${process.env.EMAIL_USER}>`,
-        to: student.email,
-        subject: `🎂 Happy Birthday ${student.name}!`,
-        html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                <h2>🎉 Happy Birthday, ${student.name}! 🎂</h2>
+    try {
 
-                <p>
-                    Student Portal ki taraf se aapko
-                    <strong>Happy Birthday</strong>!
-                </p>
+        console.log("📧 Email sending started...");
+        console.log("📧 To:", student.email);
 
-                <p>
-                    Aapka aaj ka din khushiyon aur safalta se bhara rahe.
-                </p>
+        const { data, error } = await resend.emails.send({
+            from: "Birthday Management <onboarding@resend.dev>",
+            to: [student.email],
+            subject: `🎂 Happy Birthday ${student.name}!`,
 
-                <br>
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h2>🎉 Happy Birthday, ${student.name}! 🎂</h2>
 
-                <p>Best Wishes ❤️</p>
-                <p><strong>Student Portal Team</strong></p>
-            </div>
-        `
-    };
+                    <p>
+                        Student Portal ki taraf se aapko
+                        <strong>Happy Birthday</strong>!
+                    </p>
 
-    const info = await transporter.sendMail(mailOptions);
+                    <p>
+                        Aapka aaj ka din khushiyon aur safalta se bhara rahe.
+                    </p>
 
-    console.log(
-        `Birthday email sent to ${student.email}`,
-        info.messageId
-    );
+                    <br>
 
-    return info;
+                    <p>Best Wishes ❤️</p>
+                    <p><strong>Student Portal Team</strong></p>
+                </div>
+            `
+        });
+
+        if (error) {
+            console.error("❌ Resend Error:", error);
+            return false;
+        }
+
+        console.log(
+            `✅ Birthday email sent to ${student.email}`,
+            data
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.error("❌ EMAIL ERROR:", error.message);
+        return false;
+
+    }
 };
 
 module.exports = {
