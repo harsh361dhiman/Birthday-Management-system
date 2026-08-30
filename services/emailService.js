@@ -2,13 +2,14 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-    family: 4   // 🆕 Ye line add ki — IPv4 force karne ke liye
+    family: 4 ,  // 🆕 Ye line add ki — IPv4 force karne ke liye
+    connectionTimeout: 10000 
 });
 
 const sendBirthdayEmail = async (student) => {
