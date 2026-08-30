@@ -149,7 +149,7 @@ app.listen(PORT, () => {
 
 // ================= AUTOMATIC BIRTHDAY EMAIL =================
 
-cron.schedule("5 14 * * *", async () => {
+cron.schedule("35 15 * * *", async () => {
 
     try {
 
