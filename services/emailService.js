@@ -1,16 +1,10 @@
-const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("sib-api-v3-sdk");
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    family: 4 ,  // 🆕 Ye line add ki — IPv4 force karne ke liye
-    connectionTimeout: 10000 
-});
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 const sendBirthdayEmail = async (student) => {
     try {
@@ -18,11 +12,14 @@ const sendBirthdayEmail = async (student) => {
         console.log("📧 Email sending started...");
         console.log("📧 To:", student.email);
 
-        const mailOptions = {
-            from: `"Student Portal" <${process.env.EMAIL_USER}>`,
-            to: student.email,
+        const sendSmtpEmail = {
+            sender: {
+                name: "Student Portal",
+                email: process.env.EMAIL_USER   // Brevo pe verified sender email
+            },
+            to: [{ email: student.email, name: student.name }],
             subject: `🎂 Happy Birthday ${student.name}!`,
-            html: `
+            htmlContent: `
                 <div style="font-family: Arial, sans-serif; padding: 20px;">
                     <h2>🎉 Happy Birthday, ${student.name}! 🎂</h2>
 
@@ -43,10 +40,11 @@ const sendBirthdayEmail = async (student) => {
             `
         };
 
-        const info = await transporter.sendMail(mailOptions);
+        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
 
         console.log(
-            `✅ Birthday email sent to ${student.email}: ${info.messageId}`
+            `✅ Birthday email sent to ${student.email}:`,
+            data.messageId
         );
 
         return true;
